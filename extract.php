@@ -15,12 +15,12 @@ $act_person = str_replace(" ", "_", $act_person);
 
 for ($i = 0; $i < $max_searches; $i++){
 	echo $i+1 . ".: " . $act_person . "\n";
-	echo "Bestimme Wikipedia-ID von ". $act_person .". ";
+	//echo "Bestimme Wikipedia-ID von ". $act_person .". ";
 	$wiki_id = getWikiId($act_person);
-	echo " ID: ". $wiki_id ."\n";
-	echo "Bestimme TimeWiki-ID von ". $act_person .". ";
+	//echo " ID: ". $wiki_id ."\n";
+	//echo "Bestimme TimeWiki-ID von ". $act_person .". ";
 	$time_id = getTimeId($act_person);
-	echo " ID: ". $time_id ."\n";
+	//echo " ID: ". $time_id ."\n";
 
 	if (is_numeric($wiki_id)) {
 		$act_person_depth = getDepth($wiki_id);
@@ -35,7 +35,7 @@ for ($i = 0; $i < $max_searches; $i++){
 			if (count($children) > 0) {
 				$from_id = get_ID($act_person);
 				foreach ($children as $child){
-					echo "Speichere Child-Links von " .$child. PHP_EOL;
+					//echo "Speichere Child-Links von " .$child. PHP_EOL;
 					$grandchildren = getChildren($child, $act_person_depth);
 					$grandchildren = array_diff($grandchildren, $children);
 					foreach ($grandchildren as $grandchild) {
@@ -45,33 +45,33 @@ for ($i = 0; $i < $max_searches; $i++){
 					}
 				}
 				evaluate_person(get_ID($act_person));
-				echo " Links eingetragen." . PHP_EOL;
+				//echo " Links eingetragen." . PHP_EOL;
 			} else
-				echo " Keine weiteren Links gefunden." . PHP_EOL;
+				//echo " Keine weiteren Links gefunden." . PHP_EOL;
 		} else {
-			echo "Lade Wikipedia-Text von ". $act_person ."." . PHP_EOL;
+			//echo "Lade Wikipedia-Text von ". $act_person ."." . PHP_EOL;
 			$source = getPage($wiki_id);
 
 			if ($source) {
-				echo " Text geladen." . PHP_EOL;
-				echo "Suche Links von ". $act_person ."." . PHP_EOL;		
+				//echo " Text geladen." . PHP_EOL;
+				//echo "Suche Links von ". $act_person ."." . PHP_EOL;		
 				$links = getLinks($source, $act_person);
 
 				if ($links) {
-					echo " ". count($links) ." Links gefunden:" . PHP_EOL;
+					//echo " ". count($links) ." Links gefunden:" . PHP_EOL;
 					foreach ($links as $link) echo $link . PHP_EOL;
-					echo "Checke und sichere Links von " .$act_person."." . PHP_EOL;
+					//echo "Checke und sichere Links von " .$act_person."." . PHP_EOL;
 					if (count($links) > 0){
 						saveLinks($links, $act_person, $act_quality);
-						echo " Links eingetragen." . PHP_EOL;
+						//echo " Links eingetragen." . PHP_EOL;
 					} else {
-						echo " Keine Links auf andere Personen bei " .$act_person." gefunden." . PHP_EOL;
+						//echo " Keine Links auf andere Personen bei " .$act_person." gefunden." . PHP_EOL;
 					}
 				} else {
-					echo " Keine Links bei " .$act_person." gefunden." . PHP_EOL;
+					//echo " Keine Links bei " .$act_person." gefunden." . PHP_EOL;
 				}
 			} else {
-				echo " Keinen Text gefunden." . PHP_EOL;
+				//echo " Keinen Text gefunden." . PHP_EOL;
 			}
 		}	
 	}
