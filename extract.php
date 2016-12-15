@@ -46,7 +46,7 @@ for ($i = 0; $i < $max_searches; $i++){
 				}
 				evaluate_person(get_ID($act_person));
 				//echo " Links eingetragen." . PHP_EOL;
-			} else
+			} // else
 				//echo " Keine weiteren Links gefunden." . PHP_EOL;
 		} else {
 			//echo "Lade Wikipedia-Text von ". $act_person ."." . PHP_EOL;
@@ -59,7 +59,7 @@ for ($i = 0; $i < $max_searches; $i++){
 
 				if ($links) {
 					//echo " ". count($links) ." Links gefunden:" . PHP_EOL;
-					foreach ($links as $link) echo $link . PHP_EOL;
+					//foreach ($links as $link) echo $link . PHP_EOL;
 					//echo "Checke und sichere Links von " .$act_person."." . PHP_EOL;
 					if (count($links) > 0){
 						saveLinks($links, $act_person, $act_quality);

@@ -75,7 +75,7 @@ function getPage($id) {
 
 	if ($results !== false) {
 		$array = mysql_fetch_array($results);
-		return($array[old_text]);
+		return($array['old_text']);
 	}
 }
 
