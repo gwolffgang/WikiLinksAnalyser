@@ -1,9 +1,9 @@
 <?php
 function getWikiId($target) {
-	global $conn_TimeWiki, $conn_Wikipedia;
+	global $conn_results, $conn_source;
 	
 	$sql_id = "SELECT page_latest FROM page WHERE page_title = '" .$target. "'";
-	$results = mysql_query($sql_id, $conn_Wikipedia);
+	$results = mysql_query($sql_id, $conn_source);
 
 	if($results !== false) {
 		$array = mysql_fetch_array($results);
@@ -13,10 +13,10 @@ function getWikiId($target) {
 }
 
 function getTimeId($target) {
-	global $conn_TimeWiki, $conn_Wikipedia;
+	global $conn_results, $conn_source;
 	
 	$sql_id = "SELECT id FROM persons WHERE name = '" .$target. "'";
-	$results = mysql_query($sql_id, $conn_TimeWiki);
+	$results = mysql_query($sql_id, $conn_results);
 
 	if($results !== false) {
 		$array = mysql_fetch_array($results);
@@ -26,10 +26,10 @@ function getTimeId($target) {
 }
 
 function getDepth($target) {
-	global $conn_TimeWiki, $conn_Wikipedia;
+	global $conn_results, $conn_source;
 	
 	$sql_select = "SELECT depth FROM persons WHERE wiki_id = " .$target;
-	$results = mysql_query($sql_select, $conn_TimeWiki);
+	$results = mysql_query($sql_select, $conn_results);
 
 	if($results !== false) {
 		$array = mysql_fetch_array($results);
@@ -39,17 +39,17 @@ function getDepth($target) {
 }
 
 function getChildren($parent_name, $parent_depth) {
-	global $conn_TimeWiki, $conn_Wikipedia;
+	global $conn_results, $conn_source;
 
 	$sql_id = "SELECT id FROM persons WHERE name = '" . $parent_name . "'";
-	$results = mysql_query($sql_id, $conn_TimeWiki);
+	$results = mysql_query($sql_id, $conn_results);
 	$array = mysql_fetch_array($results);
 	$parent_id = $array['id'];
 
 	if ($parent_id > 0) {
 		$parent_quality = pow(10,-($parent_depth-1));	
 		$sql_ids = "SELECT link_to FROM links WHERE link_from = ". $parent_id ." and quality = ". $parent_quality;
-		$results = mysql_query($sql_ids, $conn_TimeWiki);
+		$results = mysql_query($sql_ids, $conn_results);
 		while($row = mysql_fetch_array($results)) {
   			$IDs[] = $row['link_to'];  
 		}
@@ -58,7 +58,7 @@ function getChildren($parent_name, $parent_depth) {
 			$uniqueIDs = array_unique($IDs);
 			foreach ($uniqueIDs as $ID){
 				$sql_name = "SELECT name FROM persons WHERE id = " . $ID;
-				$result = mysql_query($sql_name, $conn_TimeWiki);
+				$result = mysql_query($sql_name, $conn_results);
 				$array = mysql_fetch_array($result);
 				$names[] = $array['name'];
 			}
@@ -68,10 +68,10 @@ function getChildren($parent_name, $parent_depth) {
 }
 
 function getPage($id) {
-	global $conn_TimeWiki, $conn_Wikipedia;
+	global $conn_results, $conn_source;
 
 	$sql_text = "SELECT old_text FROM text WHERE old_id = $id";
-	$results = mysql_query($sql_text, $conn_Wikipedia);
+	$results = mysql_query($sql_text, $conn_source);
 
 	if ($results !== false) {
 		$array = mysql_fetch_array($results);
@@ -80,7 +80,7 @@ function getPage($id) {
 }
 
 function find_candidates($source, $person_name) {
-	global $conn_TimeWiki, $conn_Wikipedia;
+	global $conn_results, $conn_source;
 
 	$candidates = array();	
 	$before = strpos($source, "[[");
@@ -116,7 +116,7 @@ function find_candidates($source, $person_name) {
 }
 
 function check_candidates($candidates) {
-	global $conn_TimeWiki, $conn_Wikipedia;
+	global $conn_results, $conn_source;
 	
 	$persons = array();
 
@@ -126,10 +126,10 @@ function check_candidates($candidates) {
 		
 		if ($check_id !== false) {
 		/*	$sql_in_DB = "SELECT wiki_id FROM persons WHERE wiki_id = $check_id";
-			$result = mysql_query($sql_in_DB, $conn_TimeWiki);
+			$result = mysql_query($sql_in_DB, $conn_results);
 			if ($result === false) { */
 				$sql_check = "SELECT old_text FROM text WHERE old_id = $check_id";
-				$check_text = mysql_query($sql_check, $conn_Wikipedia);
+				$check_text = mysql_query($sql_check, $conn_source);
 
 				if ($check_text !== false) {
 					$testsource = mysql_fetch_array($check_text)['old_text'];
@@ -148,7 +148,7 @@ function check_candidates($candidates) {
 }
 
 function display_persons($persons) {
-	global $conn_TimeWiki, $conn_Wikipedia;
+	global $conn_results, $conn_source;
 
 	if (count($persons) == 0){
 		echo "Keine Links gefunden.";
@@ -166,10 +166,10 @@ function getLinks($source, $person_name) {
 }
 
 function get_ID($person_name) {
-	global $conn_TimeWiki;
+	global $conn_results;
 		
 	$sql_id = "SELECT id FROM persons WHERE name = '" . $person_name . "'";
-	$results = mysql_query($sql_id, $conn_TimeWiki);
+	$results = mysql_query($sql_id, $conn_results);
 	$array = mysql_fetch_array($results);
 	$person_id = $array['id'];
 	$person_WikiID = getWikiID($person_name);
@@ -179,41 +179,41 @@ function get_ID($person_name) {
 }
 
 function save_Person($person_WikiID, $person_name) {
-	global $conn_TimeWiki;
+	global $conn_results;
 
 	$sql_insert = "INSERT INTO persons (wiki_id, name, importance, linking, qual_linking, linked, qual_linked, depth)
 								VALUES (" . $person_WikiID . ", '" . $person_name . "', 0, 0, 0, 0, 0, 0)";
-	$result = mysql_query($sql_insert, $conn_TimeWiki);
+	$result = mysql_query($sql_insert, $conn_results);
 	
 	$sql_id = 'SELECT id FROM persons WHERE wiki_id = "' . $person_WikiID . '"';
-	$result = mysql_query($sql_id, $conn_TimeWiki);
+	$result = mysql_query($sql_id, $conn_results);
 	$array = mysql_fetch_array($result);
 	$person_id = $array['id'];
 	return($person_id);
 }
 
 function from_to($from, $to, $father, $quality) {
-	global $conn_TimeWiki;
+	global $conn_results;
 	$sql_select = "SELECT over FROM links WHERE link_from = " .$from. " AND link_to = " .$father;
-	$results = mysql_query($sql_select, $conn_TimeWiki);
+	$results = mysql_query($sql_select, $conn_results);
 	$array = mysql_fetch_array($results);
 	$over = $array['over'];
 	if($over === NULL)
 		$over = $from;
 	
 	$sql_linking = 'INSERT INTO links (link_from, link_to, quality, over) VALUES(' .$from. ', ' .$to. ', ' .$quality. ', "' .$over. '-' .$to. '")';
-	mysql_query($sql_linking, $conn_TimeWiki);
+	mysql_query($sql_linking, $conn_results);
 }
 
 function evaluate_person($id) {
-	global $conn_TimeWiki;
+	global $conn_results;
 	
 	$importance = 0.0;
 	$quality_linking = 0.0;
 	$sum_linking = 0.0;
 	$count_linking = 0.0;
 	$sql_read_linking = 'SELECT quality FROM links WHERE link_from = ' . $id;
-	$results = mysql_query($sql_read_linking, $conn_TimeWiki);
+	$results = mysql_query($sql_read_linking, $conn_results);
 	if ($results != FALSE) {
 		while($row = mysql_fetch_array($results)) {
   			$quality_linking += $row['quality'];
@@ -228,7 +228,7 @@ function evaluate_person($id) {
 	$sum_linked = 0.0;
 	$count_linked = 0.0;
 	$sql_read_linked = 'SELECT quality FROM links WHERE link_to = ' . $id;
-	$results = mysql_query($sql_read_linked, $conn_TimeWiki);
+	$results = mysql_query($sql_read_linked, $conn_results);
 	if ($results != FALSE)
 		while($row = mysql_fetch_array($results)) {
   			$quality_linked += $row['quality'];
@@ -243,7 +243,7 @@ function evaluate_person($id) {
 											.'linked = ' .$count_linked. ', '
 											.'qual_linked = ' .$quality_linked 
 											.' WHERE id = ' .$id;
-	mysql_query($sql_write_linking, $conn_TimeWiki);
+	mysql_query($sql_write_linking, $conn_results);
 }
 
 function saveLinks($links, $person_name, $act_quality) {
@@ -258,11 +258,11 @@ function saveLinks($links, $person_name, $act_quality) {
 }
 
 function exist_in_db($name) {
-	global $conn_TimeWiki, $conn_Wikipedia;
+	global $conn_results, $conn_source;
 	
 	$name = str_replace(" ", "_", $name);
 	$sql_id = 'SELECT COUNT(*) as number FROM persons WHERE name = "' . $name . '"';
-	$result = mysql_query($sql_id, $conn_TimeWiki);
+	$result = mysql_query($sql_id, $conn_results);
 	$number = mysql_result($result, 0);
 	$existsInDb = $number > 0;
 
@@ -270,24 +270,24 @@ function exist_in_db($name) {
 }
 
 function new_act_person() {
-	global $conn_TimeWiki, $conn_Wikipedia;
+	global $conn_results, $conn_source;
 	
 	$sql_name = 'SELECT name FROM persons ORDER BY depth ASC';
-	$results = mysql_query($sql_name, $conn_TimeWiki);
+	$results = mysql_query($sql_name, $conn_results);
 	$array = mysql_fetch_array($results);
 	$person_name = $array['name'];
 	return($person_name);
 }
 
 function deeper($target){
-	global $conn_TimeWiki, $conn_Wikipedia;
+	global $conn_results, $conn_source;
 
 	$sql_read = 'SELECT depth FROM persons WHERE name = "' . $target . '"';
-	$result = mysql_query($sql_read, $conn_TimeWiki);
+	$result = mysql_query($sql_read, $conn_results);
 	$array = mysql_fetch_array($result);
 	$newdepth = $array['depth']+1;
 
 	$sql_write = 'UPDATE persons SET depth= ' . $newdepth . ' WHERE name = "' . $target . '"';
-	mysql_query($sql_write, $conn_TimeWiki);
+	mysql_query($sql_write, $conn_results);
 }
 ?>

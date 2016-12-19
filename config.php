@@ -4,9 +4,9 @@ $database_user = "root";
 {
 $database_pass = "";
 }
-$db_Wikipedia  = "source_gw";
-$db_TimeWiki  = "test_gw";
+$db_source  = "Wikipedia";
+$db_results   = "results-db";
 
-$start_person = "Angela_Merkel";
-$max_searches = 99999999;
+$start_person  = "Sokrates";
+$max_searches  = 10;
 ?>

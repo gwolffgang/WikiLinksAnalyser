@@ -5,12 +5,28 @@ require_once("functions.php");
 
 $start_time  = time();
 
+if(isset($_POST["database_host"]) && $_POST["database_host"] != "")
+	$database_user = htmlspecialchars($_POST["database_host"]);
+if(isset($_POST["database_user"]) && $_POST["database_user"] != "")
+	$database_user = htmlspecialchars($_POST["database_user"]);
+if(isset($_POST["database_pass"]) && $_POST["database_pass"] != "")
+	$database_user = htmlspecialchars($_POST["database_pass"]);
+if(isset($_POST["db_source"]) && $_POST["db_source"] != "")
+	$db_source = htmlspecialchars($_POST["db_source"]);
+if(isset($_POST["db_results"]) && $_POST["db_results"] != "")
+	$db_results = htmlspecialchars($_POST["db_results"]);
+if(isset($_POST["start_person"]) && $_POST["start_person"] != "")
+	$start_person = htmlspecialchars($_POST["start_person"]);
+if(isset($_POST["max_searches"]) && $_POST["max_searches"] != "")
+	$max_searches = $_POST["max_searches"];
+if(!is_numeric($_POST["max_searches"]) || $max_searches < 1)
+	exit;
+	
 if(exist_in_db($start_person)){
 	$act_person = new_act_person();
 } else {
 	$act_person = $start_person;
 }
-
 $act_person = str_replace(" ", "_", $act_person);
 
 for ($i = 0; $i < $max_searches; $i++){
