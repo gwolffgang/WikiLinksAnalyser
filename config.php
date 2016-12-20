@@ -4,9 +4,9 @@ $database_user = "root";
 {
 $database_pass = "";
 }
-$db_source     = "Wikipedia";
-$db_results    = "results-db";
+$db_source     = "source_db";
+$db_results    = "results_db";
 
 $start_person  = "Sokrates";
-$max_searches  = 10;
+$max_searches  = 2;
 ?>

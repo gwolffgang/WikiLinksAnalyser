@@ -18,9 +18,11 @@ if(isset($_POST["db_results"]) && $_POST["db_results"] != "")
 if(isset($_POST["start_person"]) && $_POST["start_person"] != "")
 	$start_person = htmlspecialchars($_POST["start_person"]);
 if(isset($_POST["max_searches"]) && $_POST["max_searches"] != "")
-	$max_searches = $_POST["max_searches"];
-if(!is_numeric($_POST["max_searches"]) || $max_searches < 1)
-	exit;
+	if(!is_numeric($_POST["max_searches"]))
+		if($max_searches < 1)
+			$max_searches = $_POST["max_searches"];
+		else
+			exit;
 	
 if(exist_in_db($start_person)){
 	$act_person = new_act_person();

@@ -30,7 +30,7 @@ $sql_select = "SELECT * FROM persons";
 $results = mysql_query($sql_select, $conn_results);
 $array = mysql_fetch_array($results);
 
-echo "	  <textarea name='table' rows='10' cols='100'>" . PHP_EOL;
+echo "	  <textarea name='table' rows='10' cols='100%'>" . PHP_EOL;
 echo "		<table>" . PHP_EOL;
 echo "		  <thead>" . PHP_EOL;
 echo "			<tr>" . PHP_EOL;
