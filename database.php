@@ -1,9 +1,9 @@
 <?php
-$conn_Wikipedia = mysql_connect($database_host, $database_user, $database_pass);
-mysql_select_db($db_Wikipedia, $conn_Wikipedia);
+$conn_source = mysql_connect($database_host, $database_user, $database_pass);
+mysql_select_db($db_source, $conn_source);
 
-$conn_TimeWiki = mysql_connect($database_host, $database_user, $database_pass, true);
-mysql_select_db($db_TimeWiki, $conn_TimeWiki);
+$conn_results = mysql_connect($database_host, $database_user, $database_pass, true);
+mysql_select_db($db_results, $conn_results);
 
 
 $sql_create_persons = "CREATE TABLE IF NOT EXISTS `persons` (
@@ -20,7 +20,7 @@ $sql_create_persons = "CREATE TABLE IF NOT EXISTS `persons` (
 `updated` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8";
-mysql_query($sql_create_persons, $conn_TimeWiki);
+mysql_query($sql_create_persons, $conn_results);
 
 $sql_create_links = "CREATE TABLE IF NOT EXISTS `links` (
 `link_from` INT UNSIGNED NOT NULL,
@@ -28,5 +28,5 @@ $sql_create_links = "CREATE TABLE IF NOT EXISTS `links` (
 `quality` DOUBLE UNSIGNED NOT NULL,
 `over` TEXT DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8";
-mysql_query($sql_create_links, $conn_TimeWiki);
+mysql_query($sql_create_links, $conn_results);
 ?>
