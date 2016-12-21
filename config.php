@@ -4,7 +4,7 @@ $database_user = "root";
 {
 $database_pass = "";
 }
-$db_source     = "source_db";
+$db_source     = "Wikipedia";
 $db_results    = "results_db";
 
 $start_person  = "Sokrates";
