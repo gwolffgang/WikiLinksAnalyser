@@ -7,6 +7,6 @@ $database_pass = "";
 $db_source     = "Wikipedia";
 $db_results    = "results_db";
 
-$start_person  = "Sokrates";
-$max_searches  = 2;
+$start_person  = "Angela_Merkel";
+$max_searches  = 9999999;
 ?>

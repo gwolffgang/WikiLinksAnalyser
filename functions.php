@@ -4,12 +4,13 @@ function getWikiId($target) {
 	
 	$sql_id = "SELECT page_latest FROM page WHERE page_title = '" .$target. "'";
 	$results = mysql_query($sql_id, $conn_source);
-
-	if($results !== false) {
+	if ($results !== false) {
 		$array = mysql_fetch_array($results);
 		$latest = $array['page_latest'];
-		return $latest;
+		if ($latest !== NULL)
+			return $latest;	
 	}
+	return false;
 }
 
 function getTimeId($target) {
@@ -68,7 +69,7 @@ function getChildren($parent_name, $parent_depth) {
 }
 
 function getPage($id) {
-	global $conn_results, $conn_source;
+	global $conn_source;
 
 	$sql_text = "SELECT old_text FROM text WHERE old_id = $id";
 	$results = mysql_query($sql_text, $conn_source);
@@ -79,36 +80,57 @@ function getPage($id) {
 	}
 }
 
+function is_not_on_blacklist($candidate) {
+	global $conn_results;
+
+	$sql_select = "SELECT * FROM not_a_person WHERE name = '" .$candidate. "'";
+	$results = mysql_query($sql_select, $conn_results);
+
+	if ($results !== false) {
+		$array = mysql_fetch_array($results);
+		if ($array !== false)
+			return false;
+	}
+	return true;
+}
+
 function find_candidates($source, $person_name) {
 	global $conn_results, $conn_source;
 
 	$candidates = array();	
 	$before = strpos($source, "[[");
 
-	while($before !== false) {
+	while ($before !== false) {
+		$is_not_candidate = true;
 		$after = strpos($source, "]]", $before);
 		$candidate = substr($source, $before +2, $after - $before -2);
-
-		if ($candidate !== "Digital_Object_Identifier"){
+		$candidate = str_replace(" ", "_", $candidate);
 		
-			if ($candidate !== $person_name){
+		if (is_not_on_blacklist($candidate)) {
+		
+			if ($candidate !== "Digital_Object_Identifier") {
+		
+				if ($candidate !== $person_name) {
 
-				if (strpos($candidate, ":") === false){
-
-					if (strpos($candidate, ".") === false){
+					if (strpos($candidate, ":") === false) {
 						$pipe = strpos($candidate, "|");
 
 						if(is_numeric($pipe)){
 							$candidate = substr($candidate, $pipe +1);
 						}
 
-						if (ctype_digit($candidate) === false){
+						if (ctype_digit($candidate) === false) {
 							$candidates[] = $candidate;
-						}	
+							$is_not_candidate = false;
+						}
 					}
 				}
 			}
-		}																				
+		}
+		if ($is_not_candidate) {
+			$sql_insert = "INSERT INTO not_a_person (name) VALUES ('". $candidate . "')";
+			$result = mysql_query($sql_insert, $conn_results);
+		}																		
 		$before = strpos($source,"[[", $after);
 	}
 	$uniqueCandidates = array_unique($candidates);
@@ -121,29 +143,30 @@ function check_candidates($candidates) {
 	$persons = array();
 
 	foreach ($candidates as $candidate) {
-		$candidate = str_replace(" ", "_", $candidate);
 		$check_id = getWikiId($candidate);
-		
 		if ($check_id !== false) {
-		/*	$sql_in_DB = "SELECT wiki_id FROM persons WHERE wiki_id = $check_id";
+			$sql_in_DB = "SELECT * FROM persons WHERE wiki_id = " . $check_id;
 			$result = mysql_query($sql_in_DB, $conn_results);
-			if ($result === false) { */
-				$sql_check = "SELECT old_text FROM text WHERE old_id = $check_id";
+			$array = mysql_fetch_array($result);
+			if ($array === false) {
+				$sql_check = "SELECT old_text FROM text WHERE old_id = " . $check_id;
 				$check_text = mysql_query($sql_check, $conn_source);
-
 				if ($check_text !== false) {
 					$testsource = mysql_fetch_array($check_text)['old_text'];
-
-					if (strrpos($testsource,"Kategorie:Geboren"))
+					if (strrpos($testsource, "Kategorie:Geboren"))
 						$persons[] = $candidate;
+					else {
+						$sql_insert = "INSERT INTO not_a_person (name) VALUES ('". $candidate . "')";
+						$result = mysql_query($sql_insert, $conn_results);
+					}					
 				}
-		/*	}						
-			else { 
+			}						
+			else {
 				$persons[] = $candidate;
-			} */
+			}
 		}
 	}
-	sort($persons);					
+	sort($persons);		
 	return($persons);
 }
 
@@ -235,7 +258,6 @@ function evaluate_person($id) {
 			$count_linked++;
 		}
 		$importance += $quality_linked;
-	// echo $importance ."=". $quality_linking ."+". $quality_linked . PHP_EOL;
 	
 	$sql_write_linking = 'UPDATE persons SET importance = ' .$importance. ', '
 											.'linking = ' .$count_linking. ', '
