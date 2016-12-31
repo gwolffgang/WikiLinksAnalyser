@@ -3,7 +3,6 @@ require_once("config.php");
 require_once("database.php");
 require_once("functions.php");
 
-$print = false;
 $start_time = time();
 if(isset($_POST["database_host"]) && $_POST["database_host"] != "")
 	$database_user = htmlspecialchars($_POST["database_host"]);
@@ -42,8 +41,8 @@ for ($i = 0; $i < $max_searches; $i++){
 		$act_quality = pow(10,-$act_person_depth);
 		
 		if ($act_person_depth > 0) {
-			if ($act_person_depth > 0)
-				exit;
+	//		if ($act_person_depth > 1)
+	//			exit;
 			echo "Erstelle Links ". ($act_person_depth+1) ."ten Grades von ". $act_person . PHP_EOL;
 				
 			$children = getChildren($act_person, $act_person_depth);

@@ -8,5 +8,7 @@ $db_source     = "Wikipedia";
 $db_results    = "results_db";
 
 $start_person  = "Angela_Merkel";
-$max_searches  = 9999999;
+$max_searches  = 99999999;
+
+$print 		   = false;
 ?>
